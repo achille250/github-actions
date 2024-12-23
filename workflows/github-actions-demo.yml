@@ -1,0 +1,32 @@
+name: GitHub Actions Demo
+
+on: 
+  push: 
+    branches: 
+      - main
+
+jobs:
+  demo-job:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Print GitHub event, runner, branch, and repository details
+      - name: Print Context Information
+        run: |
+          echo "Event: ${{ github.event_name }}"
+          echo "Runner: ${{ runner.os }}"
+          echo "Branch: ${{ github.ref_name }}"
+          echo "Repository: ${{ github.repository }}"
+
+      # Check out the repository code
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      # List all files in the repository
+      - name: List Repository Files
+        run: ls -la
+
+      # Display the job's status after completion
+      - name: Print Job Status
+        if: always()
+        run: echo "Job Status: ${{ job.status }}"
