@@ -17,7 +17,7 @@ jobs:
           echo "Runner: ${{ runner.os }}"
           echo "Branch: ${{ github.ref_name }}"
           echo "Repository: ${{ github.repository }}"
-
+          
       # Check out the repository code
       - name: Checkout Code
         uses: actions/checkout@v3
@@ -29,4 +29,5 @@ jobs:
       # Display the job's status after completion
       - name: Print Job Status
         if: always()
-        run: echo "Job Status: ${{ job.status }}"
+        run: |
+          echo "Job Status: ${{ job.status }}"
