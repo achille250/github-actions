@@ -45,8 +45,6 @@ jobs:
     needs: deploy_to_staging
     environment:
       name: production
-     
-      deployment_protection_rules: []
     steps:
       - name: Deploy to Production
         run: echo "🚀 Deploying to Production environment..."
