@@ -1,0 +1,93 @@
+name: helm deploy
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Select the deployment environment'
+        required: true
+        default: testing
+        type: choice
+        options:
+          - testing
+          - staging
+          - production
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Unit Tests
+        run: echo "Running unit tests..."
+
+      - name: Run Linter
+        run: echo "Linting the code..."
+
+  deploy_to_testing:
+    runs-on: ubuntu-latest
+    needs: build
+    environment:
+      name: testing
+    steps:
+      - name: Set Kubernetes Context
+        run: |
+          echo "Setting Kubernetes context for testing"
+          export KUBECONFIG=${{ secrets.KUBECONFIG_TESTING }}
+
+      - name: Install Helm
+        run: |
+          curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+          chmod 700 get_helm.sh
+          ./get_helm.sh
+
+      - name: Deploy to Testing
+        run: |
+          echo "Deploying to Testing environment..."
+          helm upgrade --install my-app ./helm-chart \
+          --namespace=testing \
+          --set environment=testing \
+          --kubeconfig=$KUBECONFIG
+
+  deploy_to_staging:
+    runs-on: ubuntu-latest
+    needs: deploy_to_testing
+    environment:
+      name: staging
+    steps:
+      - name: Set Kubernetes Context
+        run: |
+          echo "Setting Kubernetes context for staging"
+          export KUBECONFIG=${{ secrets.KUBECONFIG_STAGING }}
+
+      - name: Deploy to Staging
+        run: |
+          echo "Deploying to Staging environment..."
+          helm upgrade --install my-app ./helm-chart \
+          --namespace=staging \
+          --set environment=staging \
+          --kubeconfig=$KUBECONFIG
+
+  deploy_to_production:
+    runs-on: ubuntu-latest
+    needs: deploy_to_staging
+    environment:
+      name: production
+    steps:
+      - name: Set Kubernetes Context
+        run: |
+          echo "Setting Kubernetes context for production"
+          export KUBECONFIG=${{ secrets.KUBECONFIG_PRODUCTION }}
+
+      - name: Deploy to Production
+        run: |
+          echo "🚀 Deploying to Production environment..."
+          helm upgrade --install my-app ./helm-chart \
+          --namespace=production \
+          --set environment=production \
+          --kubeconfig=$KUBECONFIG
