@@ -15,4 +15,4 @@ This repository contains a simple GitHub Actions workflow file (`github-actions-
 
 - **GitHub Actions Integration**: Automates tasks and workflows within GitHub.
 - **Cross-platform**: Runs on the latest Ubuntu runner.
-- **Job Status Reporting**: Displays the status of the workflow job.
+- **Job Status Reporting**: Displays the status of the workflow jobs
